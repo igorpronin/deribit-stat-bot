@@ -1,12 +1,28 @@
 const appRoot = require('app-root-path');
 const appRootPath = appRoot.path;
 require('dotenv').config({path: `${appRootPath}/.env`});
+const redis = require("redis");
+const redisClient = redis.createClient();
 
 const axios = require('axios');
 
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+
+// Saves information about process to Redis
+function getUTCFullDate(Date) {
+  return `${Date.getUTCDate()}.${Date.getUTCMonth()+1}.${Date.getUTCFullYear()} ${Date.getUTCHours()}:${Date.getUTCMinutes()}:${Date.getUTCSeconds()}:${Date.getUTCMilliseconds()}`
+}
+const processTitle = 'TGDerSt';
+const startTime = getUTCFullDate(new Date());
+process.title = processTitle;
+redisClient.set(processTitle, 'Running');
+redisClient.set(`${processTitle}:pid`, process.pid);
+redisClient.set(`${processTitle}:type`, 'server');
+redisClient.set(`${processTitle}:startTime`, startTime);
+redisClient.set(`${processTitle}:description`, `@DeribitStatBot Telegram server`);
+redisClient.quit();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
