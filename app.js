@@ -119,9 +119,9 @@ function formatDeribitExtendedData(data) {
   let mes =
 `<b>Extended Deribit market data:</b>
 
-Currency: ${data.currency};
+Currency: <b>${data.currency}</b>
 
-Index: ${data.index};
+Index: <b>${data.index}</b>
 \n`;
 
   for (let i = 0; i < data.tickers.length; i++) {
