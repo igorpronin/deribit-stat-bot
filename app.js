@@ -42,7 +42,7 @@ function sendMes(mes, chatId) {
     parse_mode: 'HTML'
   })
   .then(response => {
-    console.log(`[Message sent] Message sent to user with id ${userId}`);
+    console.log(`[Message sent] Message sent to chat with id ${chatId}`);
     // console.log(response.data.explanation);
   })
   .catch(error => {
