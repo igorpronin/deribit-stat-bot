@@ -127,15 +127,14 @@ Index: ${data.index};
   for (let i = 0; i < data.tickers.length; i++) {
     const ticker = data.tickers[i];
     const instrument = ticker.instrument_name;
-    mes += '==================\n';
-    mes += `${ticker.instrument_name}\n`;
-    mes += `Price: ${ticker.mark_price}\n`;
-    mes += `Spread to index: ${(ticker.mark_price - data.index).toFixed(2)}\n`;
+    mes += `<u>${ticker.instrument_name}</u>\n`;
+    mes += `Price: <b>${ticker.mark_price}</b>\n`;
+    mes += `Spread to index: <b>${(ticker.mark_price - data.index).toFixed(2)}</b>\n`;
 
     if (instrument === 'BTC-PERPETUAL') {
-      mes += `Funding: ${(ticker.current_funding * 100).toFixed(4)}%\n`;
-      mes += `Funding 8h: ${(ticker.funding_8h * 100).toFixed(4)}%\n`;
-      mes += `Funding 8h annual: ${(ticker.funding_8h * 3 * 365 * 100).toFixed(2)}%\n`;
+      mes += `Funding: <b>${(ticker.current_funding * 100).toFixed(4)}%</b>\n`;
+      mes += `Funding 8h: <b>${(ticker.funding_8h * 100).toFixed(4)}%</b>\n`;
+      mes += `Funding 8h annual: <b>${(ticker.funding_8h * 3 * 365 * 100).toFixed(2)}%</b>\n`;
     } else {
       const premium = calcPremium(
         ticker.timestamp,
@@ -143,9 +142,10 @@ Index: ${data.index};
         ticker.index_price,
         ticker.max_price
       );
-      mes += `Spread to perpetual: ${(ticker.mark_price - data.perpetualPrice).toFixed()}\n`;
-      mes += `Premium: ${(premium * 100).toFixed(2)}%\n`;
+      mes += `Spread to perpetual: <b>${(ticker.mark_price - data.perpetualPrice).toFixed()}</b>\n`;
+      mes += `Premium: <b>${(premium * 100).toFixed(2)}%</b>\n`;
     }
+    mes += '\n';
   }
 
   return mes;
