@@ -24,7 +24,7 @@ app.post('/', (req, res, next) => {
       case '/h':
         mes = `<b>Список команд:</b>
 /h - помощь`;
-        sendMes(mes);
+        sendMes(mes, chatId);
         break;
       default:
         console.log('[Error] Unknown command.')
@@ -33,9 +33,9 @@ app.post('/', (req, res, next) => {
   res.end();
 });
 
-function sendMes(mes, userId) {
+function sendMes(mes, chatId) {
   axios.post(`https://api.telegram.org/bot${process.env.BOT_ID}:${process.env.BOT_TOKEN}/sendMessage`, {
-    chat_id: userId,
+    chat_id: chatId,
     text: mes,
     parse_mode: 'HTML'
   })
