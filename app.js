@@ -21,13 +21,18 @@ app.post('/', (req, res, next) => {
   const username = reqBody.message.from.username;
   const text = reqBody.message.text;
   let mes;
+  const help =
+`<b>Commands list:</b>
+/h - help;
+/d - extended market data on Deribit BTC-futures`;
   if (chatId === userId) {
     switch (text) {
+      case '/start':
+        mes = help;
+        sendMes(mes, chatId);
+        break;
       case '/h' || '/start':
-        mes = `<b>Commands list:</b>
-/h - help;
-/d - extended market data on Deribit BTC-futures;
-/i - BTC-index`;
+        mes = help;
         sendMes(mes, chatId);
         break;
       case '/d':
@@ -36,8 +41,6 @@ app.post('/', (req, res, next) => {
             const mes = formatDeribitExtendedData(result);
             sendMes(mes, chatId);
           });
-        break;
-      case '/i':
         break;
       default:
         console.log('[Error] Unknown command.')
