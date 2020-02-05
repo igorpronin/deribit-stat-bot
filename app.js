@@ -24,9 +24,19 @@ app.post('/', (req, res, next) => {
   if (chatId === userId) {
     switch (text) {
       case '/h':
-        mes = `<b>Список команд:</b>
-/h - помощь`;
+        mes = `<b>Commands list:</b>
+/h - help;
+/d - extended market data on Deribit BTC-futures;
+/i - BTC-index`;
         sendMes(mes, chatId);
+        break;
+      case '/d':
+        getDeribitExtendedData('BTC')
+          .then(result => {
+            sendMes(JSON.stringify(result), chatId);
+          });
+        break;
+      case '/i':
         break;
       default:
         console.log('[Error] Unknown command.')
@@ -43,10 +53,56 @@ function sendMes(mes, chatId) {
   })
   .then(response => {
     console.log(`[Message sent] Message sent to chat with id ${chatId}`);
-    // console.log(response.data.explanation);
   })
   .catch(error => {
     console.log(error);
+  });
+}
+
+function getDeribitExtendedData(cur) {
+  return new Promise((resolve, reject) => {
+    const instrumentsReq = axios(`https://www.deribit.com/api/v2/public/get_instruments?currency=${cur}&kind=future&expired=false`);
+    let instruments;
+
+    const indexReq = axios(`https://www.deribit.com/api/v2/public/get_index?currency=${cur}`);
+
+    const tickerRequests = [];
+    const tickerResponses = [];
+    const allRequests = [indexReq];
+
+    const result = {
+      tickers: tickerResponses
+    };
+
+    indexReq
+    .then(response => {
+      result.index = response.data.result[cur];
+    })
+    .catch(error => {
+      console.log(error);
+    });
+
+    instrumentsReq
+    .then(response => {
+      instruments = response.data.result;
+      result.instruments = response.data.result;
+      for (let i = 0; i < instruments.length; i++) {
+        const instrument = instruments[i].instrument_name;
+        const request = axios(`https://www.deribit.com/api/v2/public/ticker?instrument_name=${instrument}`);
+        tickerRequests.push(request);
+        allRequests.push(request);
+        request
+        .then(response => {
+          tickerResponses.push(response.data.result);
+        })
+      }
+      Promise.all(allRequests).then(() => {
+        resolve(result);
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   });
 }
 
