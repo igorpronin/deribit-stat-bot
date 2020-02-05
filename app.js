@@ -15,8 +15,8 @@ app.post('/', (req, res, next) => {
   const reqBody = req.body;
   if (process.env.DEBUG_MODE) {
     console.log(req.body);
-    if (req.body.entities) {
-      console.log(req.body.entities);
+    if (req.body.message.entities) {
+      console.log(req.body.message.entities);
     }
   }
   const chatId = reqBody.message.chat.id;
