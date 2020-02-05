@@ -146,7 +146,7 @@ Index: <b>${data.index}</b>
         ticker.timestamp,
         data.instruments[instrument].expiration_timestamp,
         ticker.index_price,
-        ticker.max_price
+        ticker.mark_price
       );
       mes += `Spread to perpetual: <b>${(ticker.mark_price - data.perpetualPrice).toFixed()}</b>\n`;
       mes += `Premium: <b>${(premium * 100).toFixed(2)}%</b>\n`;
