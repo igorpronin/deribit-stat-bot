@@ -2,6 +2,8 @@ const appRoot = require('app-root-path');
 const appRootPath = appRoot.path;
 require('dotenv').config({path: `${appRootPath}/.env`});
 
+const axios = require('axios');
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
