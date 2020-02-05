@@ -14,10 +14,10 @@ app.post('/', (req, res, next) => {
   if (process.env.DEBUG_MODE) {
     console.log(req.body);
   }
-  const chatId = reqBody.body.message.chat.id;
-  const userId = reqBody.body.message.from.id;
-  const username = reqBody.body.message.from.username;
-  const text = reqBody.body.message.text;
+  const chatId = reqBody.message.chat.id;
+  const userId = reqBody.message.from.id;
+  const username = reqBody.message.from.username;
+  const text = reqBody.message.text;
   let mes;
   if (chatId === userId) {
     switch (text) {
