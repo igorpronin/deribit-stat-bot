@@ -33,7 +33,8 @@ app.post('/', (req, res, next) => {
       case '/d':
         getDeribitExtendedData('BTC')
           .then(result => {
-            sendMes(JSON.stringify(result), chatId);
+            const mes = formatDeribitExtendedData(result);
+            sendMes(mes, chatId);
           });
         break;
       case '/i':
@@ -71,7 +72,9 @@ function getDeribitExtendedData(cur) {
     const allRequests = [indexReq];
 
     const result = {
-      tickers: tickerResponses
+      currency: cur,
+      tickers: tickerResponses,
+      instruments: {}
     };
 
     indexReq
@@ -85,9 +88,9 @@ function getDeribitExtendedData(cur) {
     instrumentsReq
     .then(response => {
       instruments = response.data.result;
-      result.instruments = response.data.result;
       for (let i = 0; i < instruments.length; i++) {
         const instrument = instruments[i].instrument_name;
+        result.instruments[instrument] = instruments[i];
         const request = axios(`https://www.deribit.com/api/v2/public/ticker?instrument_name=${instrument}`);
         tickerRequests.push(request);
         allRequests.push(request);
@@ -97,6 +100,12 @@ function getDeribitExtendedData(cur) {
         })
       }
       Promise.all(allRequests).then(() => {
+        for (let i = 0; i < result.tickers.length; i++) {
+          const ticker = result.tickers[i];
+          if (ticker.instrument_name === `${cur}-PERPETUAL`) {
+            result.perpetualPrice = ticker.mark_price;
+          }
+        }
         resolve(result);
       });
     })
@@ -105,6 +114,57 @@ function getDeribitExtendedData(cur) {
     });
   });
 }
+
+function formatDeribitExtendedData(data) {
+  let mes =
+`<b>Extended Deribit market data:</b>
+
+Currency: ${data.currency};
+
+Index: ${data.index};
+\n`;
+
+  for (let i = 0; i < data.tickers.length; i++) {
+    const ticker = data.tickers[i];
+    const instrument = ticker.instrument_name;
+    mes += '==================\n';
+    mes += `${ticker.instrument_name}\n`;
+    mes += `Price: ${ticker.mark_price}\n`;
+    mes += `Spread to index: ${(ticker.mark_price - data.index).toFixed(2)}\n`;
+
+    if (instrument === 'BTC-PERPETUAL') {
+      mes += `Funding: ${(ticker.current_funding * 100).toFixed(4)}%\n`;
+      mes += `Funding 8h: ${(ticker.funding_8h * 100).toFixed(4)}%\n`;
+      mes += `Funding 8h annual: ${(ticker.funding_8h * 3 * 365 * 100).toFixed(2)}%\n`;
+    } else {
+      const premium = calcPremium(
+        ticker.timestamp,
+        data.instruments[instrument].expiration_timestamp,
+        ticker.index_price,
+        ticker.max_price
+      );
+      mes += `Spread to perpetual: ${(ticker.mark_price - data.perpetualPrice).toFixed()}\n`;
+      mes += `Premium: ${(premium * 100).toFixed(2)}%\n`;
+    }
+  }
+
+  return mes;
+}
+
+function calcPremium(ts, expTs, ind, mp) {
+  if (!ind) {
+    return false;
+  }
+  let minTillExp = Math.round((expTs - ts) / 1000 / 60);
+  if (minTillExp <= 0) return false;
+  let premium = (mp / ind - 1) * 525600 / minTillExp;
+  return +(premium.toFixed(6));
+}
+
+// getDeribitExtendedData('BTC')
+// .then(result => {
+//   console.log(formatDeribitExtendedData(result));
+// });
 
 app.listen(process.env.PORT, () => {
   console.log(`Telegram server is listening on port ${process.env.PORT}...`);
