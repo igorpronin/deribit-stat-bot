@@ -23,7 +23,7 @@ app.post('/', (req, res, next) => {
   let mes;
   if (chatId === userId) {
     switch (text) {
-      case ('/h' || '/start'):
+      case '/h' || '/start':
         mes = `<b>Commands list:</b>
 /h - help;
 /d - extended market data on Deribit BTC-futures;
