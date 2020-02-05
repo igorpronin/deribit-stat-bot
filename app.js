@@ -10,13 +10,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.post('/', (req, res, next) => {
+  const reqBody = req.body;
   if (process.env.DEBUG_MODE) {
     console.log(req.body);
   }
-  const chatId = req.message.chat.id;
-  const userId = req.message.from.id;
-  const username = req.message.from.username;
-  const text = req.message.text;
+  const chatId = reqBody.body.message.chat.id;
+  const userId = reqBody.body.message.from.id;
+  const username = reqBody.body.message.from.username;
+  const text = reqBody.body.message.text;
   let mes;
   if (chatId === userId) {
     switch (text) {
