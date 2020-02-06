@@ -1,4 +1,4 @@
-const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient, ObjectID, Int32 } = require('mongodb');
 const appRoot = require('app-root-path');
 const appRootPath = appRoot.path;
 require('dotenv').config({path: `${appRootPath}/.env`});
@@ -21,10 +21,8 @@ function initUser(tgUserObj) {
             console.log(doc);
           });
           const user = tgUserObj;
-          user.init_ts = {
-            value: new Date().getTime(),
-            $set: { $type: 'int' }
-          };
+          user.init_ts = new Int32(new Date().getTime());
+
           dbo.collection('users').insertOne(user, (err, res) => {
             if (err) throw err;
             console.log("1 document inserted");
