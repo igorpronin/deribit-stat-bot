@@ -14,6 +14,8 @@ function initUser(tgUserObj) {
       { user_id: tgUserObj.id },
       {},
       (err, res) => {
+        console.log(err);
+        console.log(res);
         if (res) {
           res.forEach((doc) => {
             console.log(doc);
