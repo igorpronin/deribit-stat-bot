@@ -3,9 +3,8 @@ const appRootPath = appRoot.path;
 require('dotenv').config({path: `${appRootPath}/.env`});
 const redis = require("redis");
 const redisClient = redis.createClient();
-
+const { initUser } = require('./modules/db');
 const axios = require('axios');
-
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -47,6 +46,7 @@ app.post('/', (req, res, next) => {
   if (chatId === userId) {
     switch (text) {
       case '/start':
+        initUser(reqBody.message.from);
         mes = help;
         sendMes(mes, chatId);
         break;
