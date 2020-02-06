@@ -23,7 +23,7 @@ function initUser(tgUserObj) {
           const user = tgUserObj;
           user.init_ts = {
             value: new Date().getTime(),
-            $type: 'int'
+            $set: { $type: 'int' }
           };
           dbo.collection('users').insertOne(user, (err, res) => {
             if (err) throw err;
