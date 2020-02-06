@@ -96,7 +96,7 @@ function getDeribitExtendedData(cur) {
     const result = {
       currency: cur,
       tickers: tickerResponses,
-      instruments: {}
+      futures: {}
     };
 
     indexReq
@@ -112,7 +112,11 @@ function getDeribitExtendedData(cur) {
       instruments = response.data.result;
       for (let i = 0; i < instruments.length; i++) {
         const instrument = instruments[i].instrument_name;
-        result.instruments[instrument] = instruments[i];
+        if (instrument === `${cur}-PERPETUAL`) {
+          result.perpetual = instruments[i];
+        } else {
+          result.futures[instrument] = instruments[i];
+        }
         const request = axios(`https://www.deribit.com/api/v2/public/ticker?instrument_name=${instrument}`);
         tickerRequests.push(request);
         allRequests.push(request);
