@@ -11,7 +11,7 @@ function initUser(tgUserObj) {
     if (err) throw err;
     const dbo = db.db(dbName);
     dbo.collection('users').find(
-      { user_id: { $exists: false, $in: [tgUserObj.id] } },
+      { user_id: tgUserObj.id },
       {},
       (err, res) => {
         if (res) {
