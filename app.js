@@ -153,7 +153,7 @@ Index: <b>${data.index}</b>
     const spreadToIndexPrct = spreadToIndex / data.index;
     mes += `<u>${ticker.instrument_name}</u>\n`;
     mes += `Price: <b>${ticker.mark_price}</b>\n`;
-    mes += `Spread to index: <b>${spreadToIndex.toFixed(2)} (${(spreadToIndexPrct * 100).toFixed(2)}%)</b>\n`;
+    mes += `Spread to index: <b>${spreadToIndex.toFixed(2)} (${(spreadToIndexPrct * 100).toFixed(2)}% from index price)</b>\n`;
 
     if (instrument === 'BTC-PERPETUAL') {
       mes += `Funding: <b>${(ticker.current_funding * 100).toFixed(4)}%</b>\n`;
@@ -166,7 +166,9 @@ Index: <b>${data.index}</b>
         ticker.index_price,
         ticker.mark_price
       );
-      mes += `Spread to perpetual: <b>${(ticker.mark_price - data.perpetualPrice).toFixed()}</b>\n`;
+      const spreadToPerp = ticker.mark_price - data.perpetualPrice;
+      const spreadToPerpPrct = spreadToPerp / data.index;
+      mes += `Spread to perpetual: <b>${(spreadToPerp).toFixed()} (${(spreadToPerpPrct * 100).toFixed(2)}% from index price)</b>\n`;
       mes += `Premium: <b>${(premium * 100).toFixed(2)}%</b>\n`;
     }
     mes += '\n';
