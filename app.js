@@ -166,7 +166,7 @@ Index: <b>${data.index}</b>
     } else {
       const premium = calcPremium(
         ticker.timestamp,
-        data.instruments[instrument].expiration_timestamp,
+        data.futures[instrument].expiration_timestamp,
         ticker.index_price,
         ticker.mark_price
       );
