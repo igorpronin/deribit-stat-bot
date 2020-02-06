@@ -6,7 +6,7 @@ require('dotenv').config({path: `${appRootPath}/.env`});
 const url = process.env.MONGO_URL;
 const dbName = process.env.MONGO_DBNAME;
 
-export function initUser(tgUserObj) {
+function initUser(tgUserObj) {
   MongoClient.connect(url, {useUnifiedTopology: true}, (err, db) => {
     if (err) throw err;
     const dbo = db.db(dbName);
@@ -21,3 +21,5 @@ export function initUser(tgUserObj) {
       )
   })
 }
+
+module.exports.initUser = initUser;
