@@ -10,25 +10,19 @@ function initUser(tgUserObj) {
   MongoClient.connect(url, {useUnifiedTopology: true}, (err, db) => {
     if (err) throw err;
     const dbo = db.db(dbName);
-    dbo.collection('users').find(
-      { user_id: { $in: [tgUserObj.id] } },
-      {},
-      (err, res) => {
-        if (res) {
-          res.forEach((doc) => {
-            console.log(doc);
-          });
-          const user = tgUserObj;
-          user.init_date = new Date();
-
-          dbo.collection('users').insertOne(user, (err, res) => {
-            if (err) throw err;
-            console.log("1 document inserted");
-            db.close();
-          });
-        }
+    dbo.collection('users').find({ user_id: tgUserObj.id }).toArray((err, docs) => {
+      if (!docs.length) {
+        const user = tgUserObj;
+        user.user_id = user.id;
+        delete user.id;
+        user.init_date = new Date();
+        dbo.collection('users').insertOne(user, (err, r) => {
+          console.log(`Inserted ${r.insertedCount} document`);
+          db.close();
+        })
       }
-      )
+    })
+
   })
 }
 
