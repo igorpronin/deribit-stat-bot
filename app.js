@@ -149,9 +149,11 @@ Index: <b>${data.index}</b>
   for (let i = 0; i < data.tickers.length; i++) {
     const ticker = data.tickers[i];
     const instrument = ticker.instrument_name;
+    const spreadToIndex = ticker.mark_price - data.index;
+    const spreadToIndexPrct = spreadToIndex / data.index;
     mes += `<u>${ticker.instrument_name}</u>\n`;
     mes += `Price: <b>${ticker.mark_price}</b>\n`;
-    mes += `Spread to index: <b>${(ticker.mark_price - data.index).toFixed(2)}</b>\n`;
+    mes += `Spread to index: <b>${spreadToIndex.toFixed(2)} (${(spreadToIndexPrct * 100).toFixed(2)}%)</b>\n`;
 
     if (instrument === 'BTC-PERPETUAL') {
       mes += `Funding: <b>${(ticker.current_funding * 100).toFixed(4)}%</b>\n`;
