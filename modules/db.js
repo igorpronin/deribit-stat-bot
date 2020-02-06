@@ -21,7 +21,7 @@ function initUser(tgUserObj) {
             console.log(doc);
           });
           const user = tgUserObj;
-          user.init_ts = Long.toInt(new Date().getTime());
+          user.init_ts = Long.fromInt(new Date().getTime());
 
           dbo.collection('users').insertOne(user, (err, res) => {
             if (err) throw err;
