@@ -113,6 +113,7 @@ function getDeribitExtendedData(cur) {
           contract_size: 10,
           base_currency: 'BTC',
           crossSpreads: [Array]
+        }
       }
     };
 
