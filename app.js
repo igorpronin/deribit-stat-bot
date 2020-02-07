@@ -99,6 +99,11 @@ function getDeribitExtendedData(cur) {
       futures: {}
     };
 
+    const futuresBuf = {
+      exp: [],
+      expNames: {}
+    };
+
     indexReq
     .then(response => {
       result.index = response.data.result[cur];
@@ -116,6 +121,8 @@ function getDeribitExtendedData(cur) {
           result.perpetual = instruments[i];
         } else {
           result.futures[instrument] = instruments[i];
+          futuresBuf.exp.push(instruments[i].expiration_timestamp);
+          futuresBuf.expNames[instruments[i].expiration_timestamp] = instrument;
         }
         const request = axios(`https://www.deribit.com/api/v2/public/ticker?instrument_name=${instrument}`);
         tickerRequests.push(request);
@@ -126,6 +133,7 @@ function getDeribitExtendedData(cur) {
         })
       }
       Promise.all(allRequests).then(() => {
+        console.log(futuresBuf);
         for (let i = 0; i < result.tickers.length; i++) {
           const ticker = result.tickers[i];
           if (ticker.instrument_name === `${cur}-PERPETUAL`) {
