@@ -97,7 +97,7 @@ function getDeribitExtendedData(cur) {
       currency: cur,
       tickers: tickerResponses,
       futures: {
-        'BTC-26SEP20': {
+        'BTC-26ASDSD20': {
           tick_size: 0.5,
           taker_commission: 0.0005,
           settlement_period: 'month',
@@ -107,9 +107,9 @@ function getDeribitExtendedData(cur) {
           maker_commission: -0.0002,
           kind: 'future',
           is_active: true,
-          instrument_name: 'BTC-26SEP20',
-          expiration_timestamp: 1593158400000,
-          creation_timestamp: 1576833420000,
+          instrument_name: 'BTC-26ASDSD20',
+          expiration_timestamp: 1593178400000,
+          creation_timestamp: 1576832420000,
           contract_size: 10,
           base_currency: 'BTC'
         }
@@ -155,7 +155,7 @@ function getDeribitExtendedData(cur) {
           const maxExpName = futuresBuf.expNames[maxExp];
           const lowerExpNames = [];
           for (let key in futuresBuf.expNames) {
-            if (key !== maxExpName) {
+            if (futuresBuf.expNames[key] !== maxExpName) {
               lowerExpNames.push(futuresBuf.expNames[key])
             }
           }
@@ -178,14 +178,6 @@ function getDeribitExtendedData(cur) {
           }
         }
 
-        for (let key in result.futures) {
-          if (result.futures[key].crossSpreads) {
-            console.log(key);
-            console.log(result.futures[key].crossSpreads);
-          }
-        }
-
-        console.log(result);
         resolve(result);
       });
     })
