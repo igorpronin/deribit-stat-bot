@@ -111,8 +111,7 @@ function getDeribitExtendedData(cur) {
           expiration_timestamp: 1593158400000,
           creation_timestamp: 1576833420000,
           contract_size: 10,
-          base_currency: 'BTC',
-          crossSpreads: [Array]
+          base_currency: 'BTC'
         }
       }
     };
