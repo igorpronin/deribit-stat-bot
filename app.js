@@ -95,25 +95,8 @@ function getDeribitExtendedData(cur) {
 
     const result = {
       currency: cur,
-      tickers: tickerResponses,
-      futures: {
-        'BTC-26ASDSD20': {
-          tick_size: 0.5,
-          taker_commission: 0.0005,
-          settlement_period: 'month',
-          quote_currency: 'USD',
-          min_trade_amount: 10,
-          max_leverage: 100,
-          maker_commission: -0.0002,
-          kind: 'future',
-          is_active: true,
-          instrument_name: 'BTC-26ASDSD20',
-          expiration_timestamp: 1593178400000,
-          creation_timestamp: 1576832420000,
-          contract_size: 10,
-          base_currency: 'BTC'
-        }
-      }
+      tickers: {},
+      futures: {}
     };
 
     const futuresBuf = {
@@ -146,7 +129,8 @@ function getDeribitExtendedData(cur) {
         allRequests.push(request);
         request
         .then(response => {
-          tickerResponses.push(response.data.result);
+          const instrumentName = response.data.result.instrument_name;
+          result.tickers[instrumentName] = response.data.result;
         })
       }
       Promise.all(allRequests).then(() => {
@@ -171,9 +155,9 @@ function getDeribitExtendedData(cur) {
         }
         fillCross();
 
-        for (let i = 0; i < result.tickers.length; i++) {
-          const ticker = result.tickers[i];
-          if (ticker.instrument_name === `${cur}-PERPETUAL`) {
+        for (let key in result.tickers) {
+          const ticker = result.tickers[key];
+          if (key === `${cur}-PERPETUAL`) {
             result.perpetualPrice = ticker.mark_price;
           }
         }
@@ -196,8 +180,8 @@ Currency: <b>${data.currency}</b>
 Index: <b>${data.index}</b>
 \n`;
 
-  for (let i = 0; i < data.tickers.length; i++) {
-    const ticker = data.tickers[i];
+  for (let key in data.tickers) {
+    const ticker = data.tickers[key];
     const instrument = ticker.instrument_name;
     const spreadToIndex = ticker.mark_price - data.index;
     const spreadToIndexPrct = spreadToIndex / data.index;
@@ -218,7 +202,16 @@ Index: <b>${data.index}</b>
       );
       const spreadToPerp = ticker.mark_price - data.perpetualPrice;
       const spreadToPerpPrct = spreadToPerp / data.index;
-      mes += `Spread to perpetual: <b>${(spreadToPerp).toFixed()} (${(spreadToPerpPrct * 100).toFixed(2)}% from index price)</b>\n`;
+      mes += `Spread to perpetual: <b>${(spreadToPerp).toFixed(2)} (${(spreadToPerpPrct * 100).toFixed(2)}% from index price)</b>\n`;
+      if (data.futures[instrument].crossSpreads && data.futures[instrument].crossSpreads.length) {
+        for (let i = 0; i < data.futures[instrument].crossSpreads.length; i++) {
+          const crossSpreadInstrName = data.futures[instrument].crossSpreads[i];
+          const crossSpreadInstrPrice = data.tickers[crossSpreadInstrName].mark_price;
+          const thisSpread = ticker.mark_price - crossSpreadInstrPrice;
+          const thisSpreadPrct = thisSpread / data.index;
+          mes += `Spread to ${crossSpreadInstrName}: <b>${thisSpread.toFixed(2)} (${(thisSpreadPrct * 100).toFixed(2)}% from index price)</b>\n`
+        }
+      }
       mes += `Premium: <b>${(premium * 100).toFixed(2)}%</b>\n`;
     }
     mes += '\n';
