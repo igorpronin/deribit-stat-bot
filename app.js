@@ -133,13 +133,34 @@ function getDeribitExtendedData(cur) {
         })
       }
       Promise.all(allRequests).then(() => {
-        console.log(futuresBuf);
+        function fillCross() {
+          const maxExp = Math.max(...futuresBuf.exp);
+          const maxExpName = futuresBuf.expNames[maxExp];
+          const lowerExpNames = [];
+          for (let key in futuresBuf.expNames) {
+            if (key !== maxExpName) {
+              lowerExpNames.push(futuresBuf.expNames[key])
+            }
+          }
+          delete futuresBuf.expNames[maxExp];
+          const index = futuresBuf.exp.indexOf(maxExp);
+          if (index >= 0) {
+            futuresBuf.exp.splice(index, 1);
+          }
+          result.futures[maxExpName].crossSpreads = lowerExpNames;
+          if (futuresBuf.exp.length > 1) {
+            fillCross();
+          }
+        }
+        fillCross();
+
         for (let i = 0; i < result.tickers.length; i++) {
           const ticker = result.tickers[i];
           if (ticker.instrument_name === `${cur}-PERPETUAL`) {
             result.perpetualPrice = ticker.mark_price;
           }
         }
+        console.log(result);
         resolve(result);
       });
     })
