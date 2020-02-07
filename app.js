@@ -180,8 +180,8 @@ Currency: <b>${data.currency}</b>
 Index: <b>${data.index}</b>
 \n`;
 
-  for (let key in data.tickers) {
-    const ticker = data.tickers[key];
+  function createItem(ticker) {
+    let mes = '';
     const instrument = ticker.instrument_name;
     const spreadToIndex = ticker.mark_price - data.index;
     const spreadToIndexPrct = spreadToIndex / data.index;
@@ -189,11 +189,12 @@ Index: <b>${data.index}</b>
     mes += `Price: <b>${ticker.mark_price}</b>\n`;
     mes += `Spread to index: <b>${spreadToIndex.toFixed(2)} (${(spreadToIndexPrct * 100).toFixed(2)}% from index price)</b>\n`;
 
-    if (instrument === 'BTC-PERPETUAL') {
+    if (instrument === `${data.currency}-PERPETUAL`) {
       mes += `Funding: <b>${(ticker.current_funding * 100).toFixed(4)}%</b>\n`;
       mes += `Funding 8h: <b>${(ticker.funding_8h * 100).toFixed(4)}%</b>\n`;
       mes += `Funding 8h annual: <b>${(ticker.funding_8h * 3 * 365 * 100).toFixed(2)}%</b>\n`;
-    } else {
+    }
+    else {
       const premium = calcPremium(
         ticker.timestamp,
         data.futures[instrument].expiration_timestamp,
@@ -215,7 +216,22 @@ Index: <b>${data.index}</b>
       mes += `Premium: <b>${(premium * 100).toFixed(2)}%</b>\n`;
     }
     mes += '\n';
+    return mes;
   }
+
+  let futMes = '';
+
+  for (let key in data.tickers) {
+    const ticker = data.tickers[key];
+    const itemMes = createItem(ticker);
+    if (key === `${data.currency}-PERPETUAL`) {
+      mes += itemMes;
+    } else {
+      futMes += itemMes;
+    }
+  }
+
+  mes += futMes;
 
   return mes;
 }
