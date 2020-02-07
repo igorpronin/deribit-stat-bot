@@ -96,7 +96,24 @@ function getDeribitExtendedData(cur) {
     const result = {
       currency: cur,
       tickers: tickerResponses,
-      futures: {}
+      futures: {
+        'BTC-26SEP20': {
+          tick_size: 0.5,
+          taker_commission: 0.0005,
+          settlement_period: 'month',
+          quote_currency: 'USD',
+          min_trade_amount: 10,
+          max_leverage: 100,
+          maker_commission: -0.0002,
+          kind: 'future',
+          is_active: true,
+          instrument_name: 'BTC-26SEP20',
+          expiration_timestamp: 1593158400000,
+          creation_timestamp: 1576833420000,
+          contract_size: 10,
+          base_currency: 'BTC',
+          crossSpreads: [Array]
+      }
     };
 
     const futuresBuf = {
@@ -160,6 +177,14 @@ function getDeribitExtendedData(cur) {
             result.perpetualPrice = ticker.mark_price;
           }
         }
+
+        for (let key in result.futures) {
+          if (result.futures[key].crossSpreads) {
+            console.log(key);
+            console.log(result.futures[key].crossSpreads);
+          }
+        }
+
         console.log(result);
         resolve(result);
       });
