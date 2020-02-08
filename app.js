@@ -46,7 +46,10 @@ app.post('/', (req, res, next) => {
   if (chatId === userId) {
     switch (text) {
       case '/start':
-        initUser(reqBody.message.from);
+        const prom = initUser(reqBody.message.from);
+        prom.then(data => {
+          console.log(data);
+        });
         mes = help;
         sendMes(mes, chatId);
         break;
