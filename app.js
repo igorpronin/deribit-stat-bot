@@ -3,7 +3,7 @@ const appRootPath = appRoot.path;
 require('dotenv').config({path: `${appRootPath}/.env`});
 const redis = require("redis");
 const redisClient = redis.createClient();
-const { initUser } = require('./modules/db');
+const { initUser, saveMes } = require('./modules/db');
 const axios = require('axios');
 const express = require('express');
 const app = express();
@@ -47,9 +47,16 @@ app.post('/', (req, res, next) => {
     switch (text) {
       case '/start':
         const prom = initUser(reqBody.message.from);
-        prom.then(data => {
-          console.log(data);
-        });
+        prom
+          .then(data => {
+            console.log('[New user] New user!');
+            console.log(data);
+            sendMes(
+              `<b>New user:</b>\n${JSON.stringify(data)}`,
+              +process.env.ADMIN_USER_ID
+            );
+          })
+          .catch(err => {});
         mes = help;
         sendMes(mes, chatId);
         break;
@@ -68,15 +75,20 @@ app.post('/', (req, res, next) => {
         console.log('[Error] Unknown command.')
     }
   }
+  const prom = saveMes(reqBody);
+  prom
+    .then(data => {})
+    .catch(err => {});
   res.end();
 });
 
 function sendMes(mes, chatId) {
-  axios.post(`https://api.telegram.org/bot${process.env.BOT_ID}:${process.env.BOT_TOKEN}/sendMessage`, {
+  const mesParams = {
     chat_id: chatId,
     text: mes,
     parse_mode: 'HTML'
-  })
+  };
+  axios.post(`https://api.telegram.org/bot${process.env.BOT_ID}:${process.env.BOT_TOKEN}/sendMessage`, mesParams)
   .then(response => {
     console.log(`[Message sent] Message sent to chat with id ${chatId}`);
   })
